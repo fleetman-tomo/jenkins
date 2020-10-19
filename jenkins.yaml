@@ -14,7 +14,7 @@ rules:
 - apiGroups: [""]
   resources: ["pods","services"]
   verbs: ["create","delete","get","list","patch","update","watch"]
-- apiGroups: ["apps"]
+- apiGroups: [""]
   resources: ["deployments"]
   verbs: ["create","delete","get","list","patch","update","watch"]
 - apiGroups: [""]

@@ -130,3 +130,66 @@ spec:
   selector:
     app: jenkins
 ---
+# What do want?
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-jenkins-home
+spec:
+  storageClassName: mylocalstorage
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Mi
+---
+# How do we want it implemented
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pvc-jenkins-home
+spec:
+  storageClassName: mylocalstorage
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/sample/directory/structure/"
+    type: DirectoryOrCreate
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: public-routing
+
+spec:
+  rules:
+    - host: facebook.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: fleetman-webapp
+              servicePort: 80
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: secure-routing
+  annotations:
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: mycredentials
+    nginx.ingress.kubernetes.io/auth-realm: "Please make sure to enter a password!"
+
+spec:
+  rules:
+    - host: queue.facebook.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: fleetman-queue
+              servicePort: 8161
